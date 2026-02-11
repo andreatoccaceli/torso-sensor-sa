@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Original PBS directives remain.
+# NOTE: For robust isolation, consider increasing 'select=2' to a multiple of 5 (e.g., 'select=5').
+#
+#PBS -S /bin/bash
+#PBS -l select=10:ncpus=96:mpiprocs=48
+#PBS -l place=scatter
+#PBS -l walltime=96:00:00
+#PBS -N SA_torso
+#PBS -j oe
+#PBS -o stdout_main.txt
+
+# --- Setup and Environment ---
+LIFEX_PATH="/u/toccaceli/lifex-private/build_mf/examples/matrix_free/mechanics"
+cd ${LIFEX_PATH}
+source ~/.bashrc
+
+ulimit -l unlimited
+ulimit -s unlimited
+
+spack env activate -p lifex
+
+# --- Configuration Variables ---
+OUT_DIR_BASE_ROOT="/u/toccaceli/res/SA_torso"
+PRM_DIR="/u/toccaceli/heart-torso/SA"
+# Define parameter files
+PARAMS=("prolate-base.prm" "prolate-decr-ea.prm" "prolate-incr-ea.prm" "prolate-decr-r.prm" "prolate-incr-r.prm")
+NUM_RUNS=${#PARAMS[@]}
+CORES_PER_NODE=48
+DEBUG_FILE="${SETUP_DIR}/debug.txt"
+
+# --- Prepare Node File and Core Count ---
+
+# Base directory for the shared node file (can be temporary)
+SETUP_DIR="${OUT_DIR_BASE_ROOT}/sa_setup"
+mkdir -p ${SETUP_DIR}
+
+# Get unique list of allocated nodes
+NODEFILE_FULL="${SETUP_DIR}/nodefile_full"
+# Remove node8, if works you can remove the second condition
+cat ${PBS_NODEFILE} | grep -v "node8" | grep -v "node12" | grep -v "node14" | uniq > ${NODEFILE_FULL}
+
+# Total number of nodes allocated
+N_NODES=$(cat ${NODEFILE_FULL} | wc -l)
+
+# Total number of cores available (N_NODES * CORES_PER_NODE)
+N_CORES_TOTAL=$(( N_NODES * CORES_PER_NODE ))
+
+# Number of cores per individual mpirun job (1/5 of total)
+N_CORES_PER_RUN=$(( N_CORES_TOTAL / NUM_RUNS ))
+
+if [ $N_CORES_PER_RUN -eq 0 ]; then
+    echo "ERROR: Total cores ($N_CORES_TOTAL) is less than the number of runs ($NUM_RUNS). Cannot partition cores." > ${DEBUG_FILE}
+    exit 1
+fi
+
+# Set MPI environment variables
+export I_MPI_HYDRA_IFACE=bond0
+export I_MPI_HYDRA_BOOTSTRAP=ssh
+
+# --- Run the 5 Jobs in Parallel ---
+echo "Starting $NUM_RUNS parallel mpirun jobs, each with $N_CORES_PER_RUN cores." > ${DEBUG_FILE}
+
+# Loop through the runs
+for PRM_FILE in "${PARAMS[@]}"; do
+    
+    # 1. Get the parameter name without the '.prm' extension
+    RUN_NAME=$(basename $PRM_FILE .prm)
+    
+    # 2. Define the new, specific output directory
+    OUT_DIR="${OUT_DIR_BASE_ROOT}/sa-torso-${RUN_NAME}"
+    rm -rf ${OUT_DIR}    
+    mkdir -p ${OUT_DIR}
+    
+    echo "Starting job for: ${PRM_FILE}" > ${DEBUG_FILE}
+    
+    # Run mpirun in the background
+    mpirun \
+        -f ${NODEFILE_FULL} \
+        -n ${N_CORES_PER_RUN} \
+        ${LIFEX_PATH}/lifex_example_mf_mechanics \
+        -f ${PRM_DIR}/$PRM_FILE \
+        -o ${OUT_DIR} \
+        &> ${OUT_DIR}/stdout.txt & # The '&' runs the command in the background
+        
+    echo "Job for $RUN_NAME started with $N_CORES_PER_RUN cores. Output to ${OUT_DIR}/stdout.txt" > ${DEBUG_FILE}
+
+done
+

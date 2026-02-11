@@ -1,0 +1,471 @@
+# Listing of Parameters
+# ---------------------
+subsection Mechanics example
+  # List of boundary tags where homogeneous Dirichlet boundary conditions are
+  # applied.
+  set Homogeneous Dirichlet tags = 2
+
+  # Optional tags where to impose non-homogenous Dirichlet BCs imported from a
+  # .vtk file.
+  set Imported Dirichlet BC tags = 10 
+
+  # List of boundary tags where pressure boundary conditions are applied.
+  set Pressure tags              =
+
+  # List of values of pressure boundary conditions [Pa].
+  set Pressure values            =
+
+  # Type of example to run. If set to moving beam it applies a predefined
+  # initial condition.
+  # Available options are: Generic | Moving beam.
+  set Initial condition          = Zero
+
+
+  subsection Imported Dirichlet data
+      
+        # Polygonal surface filename with the definition of the displacements
+        # on the boundary.
+        # If empty, displacement must be implemented as a Function in the
+        # code.
+        set Filename         = /u/toccaceli/heart-torso/displacement_prolate.vtu
+
+        # Basename of the displacement fields on the boundary.
+        # If Boundary displacements filename is empty, this param is
+        # neglected.
+        set Field basename    = displacement_
+
+        set Vectorial data = true
+
+        # The geometry of the imported file is scaled by this factor.
+        set Geometry scaling factor                 = 1e-3
+
+        # Imported displacement is scaled by this factor.
+        set Data scaling factor            = 1
+
+        # Number of figures to represent the time index used in the field name
+        # (e.g. 2 in the case displacement00, displacement01, ...).
+        set Number of digits         = 3
+
+        # First index of the input time-dependent boundary displacement. e.g.
+        # 00 for "displacement00".
+        set Initial index                           = 000
+
+        # Number of time subintervals of the input time-dependent boundary
+        # displacement.
+        set Final index                       = 159
+
+        # Stride between two consecutive time indices of a subinterval (e.g. 3
+        # for displacement00, displacement03, displacement06, ...).
+        set Index stride                     = 200
+
+       # initial time
+        set Initial time               = 0.0
+
+        # [s]. Final time of the input time-dependent boundary displacement.
+        set Final time                             = 0.8
+      end
+
+end
+
+
+subsection Mechanics
+  # Toggle between the matrix-based and matrix-free solver implementation.
+  # Available options are: Matrix-based | Matrix-free.
+  set Solver type = Matrix-free
+
+
+  subsection Mesh and space discretization
+    # Degree of the FE space for d.
+    set FE space degree (d)   = 2
+
+    # Available options are: File | Hypercube.
+    set Mesh type             = File
+
+    # Specify whether the input mesh has hexahedral or tetrahedral elements.
+    # Tetrahedral meshes can only be imported from file.
+    # Available options are: Hex | Tet.
+    set Element type          = Tet
+
+    # Number of global mesh refinement steps applied to the initial grid.
+    # Ignored if restart is enabled.
+    set Number of refinements = 0
+
+
+    subsection File
+      # Mesh file.
+      set Filename       = /u/toccaceli/heart-torso/torso_tet-prolate_coarser.msh
+
+      # Mesh scaling factor: 1e-3 => from [mm] to [m].
+      set Scaling factor = 1e-3
+    end
+
+    subsection Hypercube
+      # Left endpoint.
+      set Left     = 0
+
+      # Right endpoint.
+      set Right    = 1
+
+      # Colorize boundary IDs.
+      set Colorize = true
+    end
+
+  end
+
+  subsection Matrix-based preconditioner
+  end
+
+  subsection Matrix-free preconditioner
+    # Type of preconditioner to use. If set to matrix-based, the
+    # preconditioner is constructed using the parameters in the matrix-based
+    # preconditioner section.
+    # Available options are: Identity | Chebyshev | p-multigrid |
+    # Matrix-based.
+    set Preconditioner type = Chebyshev
+  end
+
+  subsection Time solver
+    # Initial time.
+    set Initial time                       = 0.0
+
+    # Final time.
+    set Final time                         = 2.4
+
+    # Time step.
+    set Time step                          = 5e-3
+
+    # Time advancing scheme for a second-order problem.
+    # Available options are: Finite Difference | Generalized Alpha.
+    set Second order time advancing scheme = Generalized Alpha
+
+
+    subsection Generalized Alpha
+      set Optimal case = true
+      set Rho infinity = 0.5
+      set Alpha m = 0.0
+      set Alpha f = 0.0
+      # Value of Gamma of the Newmark scheme.
+      set Gamma = 0.5
+
+      # Value of beta of the Newmark scheme.
+      set Beta  = 0.25
+    end
+
+  end
+
+  subsection Output
+    # Toggle output.
+    set Enable output                 = true
+
+    # Basename for the output files. It will be suffixed with the timestep
+    # index and the appropriate extension.
+    set Output basename               = solution
+
+    # 3D output will be saved only every n timesteps.
+    set Save output every n timesteps = 100
+
+    # Save results saving from a user-specified time [s].
+    set Start saving from time        = 0
+
+    # Toggle output of velocity.
+    set Output velocity               = true
+
+    # Toggle output of acceleration.
+    set Output acceleration           = true
+  end
+
+  subsection Serialization
+    # Toggle serialization of the solution for successive restart.
+    set Enable                      = false
+
+    # Basename for the output files. It will be suffixed with the timestep
+    # index and the appropriate extension.
+    set Serialization basename      = restart
+
+    # Only serialize every this many timesteps.
+    set Serialize every n timesteps = 1
+  end
+
+  subsection Restart
+    # Enable reloading the simulation state from previously serialized files.
+    set Enable                 = false
+
+    # Basename for the input files. It will be suffixed with the restart
+    # timestep index and the appropriate extension.
+    set Restart basename       = restart
+
+    # Timestep index to load when restarting.
+    set Restart timestep index = 0
+  end
+
+  subsection Non-linear solver
+    # If true, the following parameters will be ignored: the max. number of
+    # iterations will implicitly be set to 1 and tolerances to 0.
+    set Linearized                   = false
+    set Maximum number of iterations = 50
+    set Absolute residual tolerance  = 1e-8
+    set Relative residual tolerance  = 1e-8
+    set Relative increment tolerance = 1e-10
+  end
+
+  subsection Linear solver
+    set Maximum number of iterations = 1000
+    # Tolerance for the absolute l2 residual norm.
+    set Tolerance                    = 1e-10
+
+    # Reduction factor w.r.t. initial linear solver residual. If 0, then only
+    # the absolute residual norm is checked as a stopping criterion.
+    set Reduction                    = 0
+
+    # Available options are: BiCGStab | CG | GMRES.
+    set Solver type                  = GMRES
+  end
+
+  subsection Physical constants and models
+    # Density [kg/m^3].
+    set Density           = 1e3
+
+    # Viscosity [Pa * s].
+    set Viscosity         = 0
+
+    # Passive mechanics constitutive model.
+    # Available options are: Guccione | Hooke | Neo-Hooke.
+    set Energy functional = Hooke
+
+    # If set to false, the inertial terms are considered.
+    set Quasi static      = false
+
+
+    subsection Energy functional parameters
+      subsection Guccione
+        # a_ff [1].
+        set a_ff         = 8
+
+        # a_ss [1].
+        set a_ss         = 6
+
+        # a_nn [1].
+        set a_nn         = 3
+
+        # a_fs [1].
+        set a_fs         = 12
+
+        # a_fn [1].
+        set a_fn         = 3
+
+        # a_sn [1].
+        set a_sn         = 3
+
+        # c [Pa].
+        set c            = 0.88e3
+
+        # Bulk modulus [Pa].
+        set Bulk modulus = 5e4
+      end
+
+      subsection Hooke
+        # Young modulus [Pa].
+        set Young modulus = 8e5
+
+        # Poisson ratio.
+        set Poisson ratio = 0.49
+      end
+
+      subsection Neo-Hooke
+        # Shear modulus [Pa].
+        set Shear modulus = 1e4
+
+        # Bulk modulus [Pa].
+        set Bulk modulus  = 5e4
+      end
+
+    end
+
+  end
+
+end
+
+
+subsection Fiber generation
+  # Type of geometry represented by the mesh.
+  # Available options are: Left ventricle | Slab.
+  set Geometry type      = Left ventricle
+
+  # Angular dispersion [°][+]. Fibers f0 are gaussian distributed around a
+  # dominant direction identified by the alpha angle with an angular
+  # dispersion value as standard deviation. If set to zero no fiber dispersion
+  # is prescribed.
+  set Angular dispersion = 0
+
+
+  subsection Output
+    # Toggle output.
+    set Enable output   = true
+
+    # Basename for the output files. It will be suffixed with the appropriate
+    # extension.
+    set Output basename = solution
+  end
+
+  subsection Left ventricle
+    # Algorithm type.
+    # Available options are: RL.
+    set Algorithm type = RL
+
+
+    subsection RL
+      # Boundary tags of Ventricular base.
+      set Tags base      = 50
+
+      # Boundary tags of epicardium.
+      set Tags epi       = 10
+
+      # Coordinates for Normal to Ventricular base.
+      set Normal to base = 0 0 -1
+
+      # Boundary tags of endocardium.
+      set Tags endo      = 20
+
+      # Alpha left epicardium [°][-].
+      set alpha epi      = -60
+
+      # Alpha left endocardium [°][+].
+      set alpha endo     = 60
+
+      # Beta left epicardium [°][+].
+      set beta epi       = 20
+
+      # Beta left endocardium [°][-].
+      set beta endo      = -20
+    end
+
+  end
+
+  subsection Slab
+    # Boundary tags of Slab base up.
+    set Tags base up             = 50
+
+    # Boundary tags of Slab base down.
+    set Tags base down           = 60
+
+    # Boundary tags of epicardium.
+    set Tags epi                 = 10
+
+    # Boundary tags of endocardium.
+    set Tags endo                = 20
+
+    # Alpha left epicardium [°][-].
+    set alpha epi                = 0
+
+    # Alpha left endocardium [°][+].
+    set alpha endo               = 0
+
+    # Beta left epicardium [°][+].
+    set beta epi                 = 0
+
+    # Beta left endocardium [°][-].
+    set beta endo                = 0
+
+    # Fiber transmurality type: linear (smooth variation between endocardium
+    # and epicardium), bi-layers (sharp transition between a subendocardial
+    # and subepicardial layers)
+    # Available options are: Linear | Bilayer.
+    set Fiber transmurality type = Linear
+  end
+
+  subsection Mesh and space discretization
+    # Correct possible NaN fibers with cartesian fibers
+    # {f0,s0,n0}={[1,0,0],[0,1,0],[0,0,1]}.
+    set Enable avoid NaN fibers = true
+
+    # Offset term to be added to the transmural laplace solution to prevent
+    # NaN fibers (not available for BT algo type)
+    set Offset term             = 0
+  end
+
+  subsection Serialize bundles
+    # Enable serialization of bundle coefficients.
+    set Enable   = false
+
+    # Output filename.
+    set Filename =
+  end
+
+  subsection Laplace solver
+    # Toggle between the matrix-based and matrix-free solver implementation.
+    # Available options are: Matrix-based | Matrix-free.
+    set Solver type = Matrix-based
+
+
+    subsection Matrix-based preconditioner
+    end
+
+    subsection Matrix-free preconditioner
+      # Type of preconditioner to use. If set to matrix-based, the
+      # preconditioner is constructed using the parameters in the matrix-based
+      # preconditioner section.
+      # Available options are: Identity | Chebyshev | p-multigrid |
+      # Matrix-based.
+      set Preconditioner type = Chebyshev
+    end
+
+    subsection Linear solver
+      set Maximum number of iterations = 1000
+      # Tolerance for the absolute l2 residual norm.
+      set Tolerance                    = 1e-10
+
+      # Reduction factor w.r.t. initial linear solver residual. If 0, then
+      # only the absolute residual norm is checked as a stopping criterion.
+      set Reduction                    = 0
+
+      # Available options are: BiCGStab | CG | GMRES.
+      set Solver type                  = GMRES
+    end
+
+  end
+
+  subsection Gradient projection
+    # Toggle between the matrix-based and matrix-free solver implementation.
+    # Available options are: Matrix-based | Matrix-free.
+    set Solver type = Matrix-based
+
+
+    subsection Matrix-based preconditioner
+    end
+
+    subsection Matrix-free preconditioner
+      # Type of preconditioner to use. If set to matrix-based, the
+      # preconditioner is constructed using the parameters in the matrix-based
+      # preconditioner section.
+      # Available options are: Identity | Chebyshev | p-multigrid |
+      # Matrix-based.
+      set Preconditioner type = Chebyshev
+    end
+
+    subsection Linear solver
+      set Maximum number of iterations = 1000
+      # Tolerance for the absolute l2 residual norm.
+      set Tolerance                    = 1e-10
+
+      # Reduction factor w.r.t. initial linear solver residual. If 0, then
+      # only the absolute residual norm is checked as a stopping criterion.
+      set Reduction                    = 0
+
+      # Available options are: BiCGStab | CG | GMRES.
+      set Solver type                  = GMRES
+    end
+
+    subsection Regularization
+      # Absolute regularization radius [m]. Set to zero to disable.
+      set Absolute regularization radius = 0.0
+
+      # Relative regularization radius, normalized with respect to the cell
+      # diameter. Set to zero to disable.
+      set Relative regularization radius = 0.0
+    end
+
+  end
+
+end
+
+

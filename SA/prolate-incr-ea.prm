@@ -1,0 +1,114 @@
+# Listing of Parameters
+# ---------------------
+subsection Mechanics example
+  set Homogeneous Dirichlet tags = 30 
+  set Imported Dirichlet BC tags = 10 #note that 20 is prolate surface and is kept empty to apply homogenous neumann
+  subsection Robin BC
+    set Robin BC tags       = 2, 11, 12 #base, neck, rarms
+    set Mass coefficents    = 200000.0, 200000.0, 200000.0
+    set Damping coefficents = 2000.0, 2000.0, 2000.0
+  end
+  set Initial condition          = Zero
+
+  subsection Imported Dirichlet data
+        set Filename         = /u/toccaceli/heart-torso/SA/disps/displacement_increase_Ea.vtp
+        set Field basename    = displacement_
+        set VTK Data type = PolyData
+        set VTK Array Data type = PointData
+        set Vectorial data = true
+        set Geometry scaling factor                 = 1e-3
+        set Data scaling factor            = 2e-4
+        set Number of digits         = 3
+        set Initial index                           = 000
+        set Final index                       = 159
+        set Index stride                     = 1
+        set Initial time               = 0.0
+        set Final time                             = 0.8
+      end
+
+end
+
+
+subsection Mechanics
+  set Solver type = Matrix-based
+
+
+  subsection Mesh and space discretization
+    set FE space degree (d)   = 1
+    set Mesh type             = File
+    set Element type          = Tet
+    set Number of refinements = 0
+
+    subsection File
+      set Filename       = /u/toccaceli/heart-torso/mesh/torso_tet_prolate_coarser_multiple_tags.msh
+      set Scaling factor = 1e-3
+    end
+  end
+
+  subsection Matrix-based preconditioner
+  end
+
+  subsection Matrix-free preconditioner
+    # Type of preconditioner to use. If set to matrix-based, the
+    # preconditioner is constructed using the parameters in the matrix-based
+    # preconditioner section.
+    # Available options are: Identity | Chebyshev | p-multigrid |
+    # Matrix-based.
+    set Preconditioner type = Chebyshev
+  end
+
+  subsection Time solver
+    set Initial time                       = 0.0
+    set Final time                         = 2.4
+    set Time step                          = 1e-3
+    set Second order time advancing scheme = Generalized Alpha
+
+
+    subsection Generalized Alpha
+      set Optimal case = true
+      set Rho infinity = 0.7
+      set Alpha m = 0.0
+      set Alpha f = 0.0
+      # Value of Gamma of the Newmark scheme.
+      set Gamma = 0.5
+
+      # Value of beta of the Newmark scheme.
+      set Beta  = 0.25
+    end
+
+  end
+
+  subsection Output
+    set Enable output                 = true
+    set Output basename               = solution
+    set Save output every n timesteps = 5
+    set Start saving from time        = 0
+    set Output velocity               = true
+    set Output acceleration           = true
+  end
+
+  subsection Physical constants and models
+    # Density [kg/m^3].
+    set Density           = 1e3
+
+    # Viscosity [Pa * s].
+    set Viscosity         = 0
+    set Energy functional = Hooke
+
+    # If set to false, the inertial terms are considered.
+    set Quasi static      = false
+
+
+    subsection Energy functional parameters
+      subsection Hooke
+        # Young modulus [Pa].
+        set Young modulus = 8e5
+
+        # Poisson ratio.
+        set Poisson ratio = 0.49
+      end
+    end
+  end
+end
+
+
