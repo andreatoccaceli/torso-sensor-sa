@@ -1,9 +1,9 @@
 #!/bin/bash
 #PBS -S /bin/bash
-#PBS -l select=1:ncpus=96:mpiprocs=48
+#PBS -l select=2:ncpus=96:mpiprocs=48
 #PBS -l place=scatter
 #PBS -l walltime=96:00:00
-#PBS -N torso-elastodynamics
+#PBS -N torso-elasto-mb
 #PBS -j oe
 #PBS -o stdout.txt
 
@@ -17,11 +17,12 @@ ulimit -s unlimited
 
 spack env activate -p lifex
 
-OUT_DIR="/u/toccaceli/res/heart-torso-prolate"
+OUT_DIR="/u/toccaceli/res/heart-torso-prolate-mb-robin-gena07-dt1em3"
 PRM_DIR="/u/toccaceli/heart-torso"
 mkdir -p ${OUT_DIR}
 
-cat ${PBS_NODEFILE} | uniq > ${OUT_DIR}/nodefile
+#cat ${PBS_NODEFILE} | uniq > ${OUT_DIR}/nodefile
+cat ${PBS_NODEFILE} | grep -v "node8"| grep -v "node7"| grep -v "node14"| grep -v "node12" |uniq > ${OUT_DIR}/nodefile
 
 export I_MPI_HYDRA_IFACE=bond0
 export I_MPI_HYDRA_BOOTSTRAP=ssh

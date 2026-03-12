@@ -13,8 +13,8 @@ from scipy.signal import savgol_filter
 # 1. CONFIGURATION
 # ==========================================
 # --- INPUTS ---
-CSV_FILE = "0D-volumes/circulation_base.csv"
-BASE_NAME = "base_savgol"
+CSV_FILE = "0D-volumes/circulation_reduced.csv"
+BASE_NAME = "reduced"
 
 plot_sol_img = f"{BASE_NAME}_vol.png"
 
@@ -22,8 +22,8 @@ plot_sol_img = f"{BASE_NAME}_vol.png"
 MESH_FILE = "/home/andrea/Scrivania/phd/dev/mesh-generation/torso/pvpython/temp_geometry.msh" 
 
 # --- TIME RANGE ---
-TIME_START = 39.2
-TIME_END = 40.0
+TIME_START = 78.4
+TIME_END = 79.2
 
 # --- GEOMETRY (Apex Location) ---
 # CRITICAL UPDATE:
@@ -41,16 +41,6 @@ SAVE_MODE = "single"
 OUTPUT_SINGLE_NAME = f"displacement_{BASE_NAME}.vtp"
 OUTPUT_DIR_NAME = "prolate_displacement"
 
-# --- INTERPOLATION SETTINGS ---
-# Options: "spline" (Passes through points exactly. On original grid = Raw Data)
-#          "savgol" (Smooths values in-place. Good for reducing acceleration spikes)
-#            "None"
-INTERPOLATION_METHOD = "savgol" 
-
-# Savitzky-Golay Parameters (Only used if method is "savgol")
-SAVGOL_WINDOW = 11  # Must be odd
-SAVGOL_POLY = 3     # Cubic smoothing
-
 # ==========================================
 # 2. DATA LOADING & PREPROCESSING
 # ==========================================
@@ -64,35 +54,17 @@ if df.empty:
     sys.exit(1)
 
 # Extract Raw Data
-raw_times = df['time'].values
-raw_volumes = df['VLV'].values 
+raw_times = df['time'].values.copy()
+raw_volumes = df['VLV'].values.copy() 
 
 print(f"Time steps found: {len(raw_times)}")
 
-# --- APPLY METHOD ---
-print(f"--- Applying Method: {INTERPOLATION_METHOD} (On Original Grid) ---")
-
 # Initialize output variables
 times = raw_times
-volumes = None
-plot_label = ""
-
-if INTERPOLATION_METHOD == "spline":
-    # METHOD A: CUBIC SPLINE (No Resampling)
-    # Since we are keeping the original time grid, this is just the Raw Data.
-    # (Splines interpolate exactly through the knots).
-    volumes = raw_volumes
-    plot_label = "Cubic Spline / Raw (Exact Fit)"
-
-elif INTERPOLATION_METHOD == "savgol":
-    # METHOD B: SAVITZKY-GOLAY SMOOTHING
-    # This modifies the values at the existing time points to be smoother.
-    volumes = savgol_filter(raw_volumes, window_length=SAVGOL_WINDOW, polyorder=SAVGOL_POLY)
-    plot_label = f"Savitzky-Golay (Window={SAVGOL_WINDOW})"
-
-else:
-    print(f"Error: Unknown method '{INTERPOLATION_METHOD}'")
-    sys.exit(1)
+volumes = df['VLV'].values.copy() # Using smooth volume
+# if volumes[-1] != volumes[0]:
+#     print(f"Datum not periodic, enforcing it. V[0] : {volumes[0]}, V[-1] : {volumes[-1]}")
+#     volumes[-1] = volumes[0] # ensure periodicity
 
 # Set Reference Volume
 V_ref = volumes[0]
@@ -103,18 +75,16 @@ print("Plotting comparison...")
 plt.figure(figsize=(10, 6))
 
 # Plot Raw (Red Dots)
-plt.plot(raw_times, raw_volumes, 'o', color='red', alpha=0.3, label='Raw Input')
-
-# Plot Result (Blue Line)
-plt.plot(times, volumes, 'b-', linewidth=1.5, label=plot_label)
+plt.plot(raw_times, raw_volumes, color='black', alpha=0.5, label='No periodicity')
+plt.plot(times, volumes, color="red", alpha=0.8, label="Periodicity")
 
 plt.legend()
 plt.title(f"Volume Processing: {BASE_NAME}")
 plt.xlabel("Time (s)")
 plt.ylabel("Volume (mL)")
 plt.grid(True, linestyle=':')
-plt.savefig(plot_sol_img, dpi=300)
-# plt.show()
+#plt.savefig(plot_sol_img, dpi=300)
+plt.show()
 
 # ==========================================
 # 3. MESH SETUP
