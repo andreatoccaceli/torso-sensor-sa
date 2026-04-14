@@ -8,3 +8,6 @@
 
 # no csv data
 *.csv
+
+*.job
+*.prm

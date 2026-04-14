@@ -9,42 +9,30 @@ from scipy.stats import pearsonr
 from helpers import *
 
 # cases
-CASE = "csv-data-rho05"
+CASE = "csv-data-new"
 CASES = {
     # "Baseline": {
     #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/base.csv",
     #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_base.csv"
     # },
     "Baseline": {
-        "3d": f"/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/rho05.csv",
-        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_smooth.csv"
+        "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/sa_base.csv",
+        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv"
     },
-    # "Baseline-Smooth_03": {
-    #     "3d": f"/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/rho03.csv",
-    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_smooth.csv"
-    # },
-    "Baseline-Smooth_05_periodic": {
-        "3d": f"/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/rho05_periodic.csv",
-        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_smooth.csv"
+    "IncrElastance": {
+        "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/sa_incr_ea.csv",
+        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_increase_Ea.csv"
     },
-    # "Savgol": {
-    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/savgol.csv",
-    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_base.csv"
-    # },
-    # "IncrElastance": {
-    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/incr-ea.csv",
-    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_increase_Ea.csv"
-    # },
     # "DecrElastance": {
-    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/decr-ea.csv",
+    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/sa_decr_ea.csv",
     #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_decrease_Ea.csv"
     # },
     # "IncrResistance": {
-    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/incr-r.csv",
+    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/sa_incr_r.csv",
     #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_increase_R.csv"
     # },
     # "DecrResistance": {
-    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/decr-r.csv",
+    #     "3d": f"/home/andrea/Scrivania/phd/dev/torso-sensor-sa/SA/{CASE}/sa_decr_r.csv",
     #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_decrease_R.csv"
     # }
 }

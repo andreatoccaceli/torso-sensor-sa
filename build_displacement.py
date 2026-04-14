@@ -9,12 +9,9 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 from scipy.signal import savgol_filter
 
-# ==========================================
-# 1. CONFIGURATION
-# ==========================================
 # --- INPUTS ---
-CSV_FILE = "0D-volumes/circulation_reduced.csv"
-BASE_NAME = "reduced"
+CSV_FILE = "0D-volumes/circulation_regurgitant_reduced.csv"
+BASE_NAME = "regurgitant"
 
 plot_sol_img = f"{BASE_NAME}_vol.png"
 
@@ -25,15 +22,14 @@ MESH_FILE = "/home/andrea/Scrivania/phd/dev/mesh-generation/torso/pvpython/temp_
 TIME_START = 78.4
 TIME_END = 79.2
 
+
 # --- GEOMETRY (Apex Location) ---
-# CRITICAL UPDATE:
 # Original Apex was at (0, 0, -60).
 # Translation applied was (70.1286, 1351.41, 67.9257).
 # New Z = -60 + 67.9257 = 7.9257
 # New Apex = [70.1286, 1351.41, 7.9257]
 #APEX_COORDS = np.array([-70.1286, -1351.41, -127.9257])
 
-# --- OUTPUT SETTINGS ---
 # "single": Saves 1 file with arrays 'displacement_000'...
 # "multiple": Saves many files in a folder (BEST FOR ANIMATION)
 SAVE_MODE = "single"  
@@ -48,26 +44,21 @@ print(f"--- Reading {CSV_FILE} ---")
 df = pd.read_csv(CSV_FILE)
 
 # Filter Time
-df = df[(df['time'] >= TIME_START) & (df['time'] <= TIME_END)].copy()
-if df.empty:
-    print(f"Error: No data in range {TIME_START} - {TIME_END}")
-    sys.exit(1)
-
-# Extract Raw Data
-raw_times = df['time'].values.copy()
-raw_volumes = df['VLV'].values.copy() 
-
-print(f"Time steps found: {len(raw_times)}")
+# df = df[(df['time'] >= TIME_START) & (df['time'] <= TIME_END)].copy()
+# if df.empty:
+#     print(f"Error: No data in range {TIME_START} - {TIME_END}")
+#     sys.exit(1)
 
 # Initialize output variables
-times = raw_times
-volumes = df['VLV'].values.copy() # Using smooth volume
-# if volumes[-1] != volumes[0]:
-#     print(f"Datum not periodic, enforcing it. V[0] : {volumes[0]}, V[-1] : {volumes[-1]}")
-#     volumes[-1] = volumes[0] # ensure periodicity
+times = df['time'].values.copy()
+volumes = df['VLV'].values.copy() 
+print(f"Time steps found: {len(times)}")
+
 
 # Set Reference Volume
-V_ref = volumes[0]
+# Keep attention: this reference value is wrt to a physiological case.
+# This means that for a pathological case wehre VLV > Vref then we have an initial increment of the volume
+V_ref = 158  #volumes[0]
 print(f"Ref Volume: {V_ref:.2f}")
 
 # --- PLOTTING ---
@@ -75,8 +66,7 @@ print("Plotting comparison...")
 plt.figure(figsize=(10, 6))
 
 # Plot Raw (Red Dots)
-plt.plot(raw_times, raw_volumes, color='black', alpha=0.5, label='No periodicity')
-plt.plot(times, volumes, color="red", alpha=0.8, label="Periodicity")
+plt.plot(times, volumes, color="red", alpha=0.8)
 
 plt.legend()
 plt.title(f"Volume Processing: {BASE_NAME}")
@@ -96,7 +86,6 @@ print(f"--- Loading {MESH_FILE} ---")
 msh = meshio.read(MESH_FILE)
 original_points = msh.points 
 
-# --- AUTO-DETECT APEX LOGIC ---
 # We assume the Apex is the bottom-most point (Minimum Z value).
 # This works perfectly for the vertical prolate spheroid you generated.
 min_z_index = np.argmin(original_points[:, 2]) # Find index of lowest Z
@@ -125,10 +114,6 @@ if msh.cells:
 # Vector = Point - Apex
 # This vector defines the direction of contraction.
 vec_from_apex = original_points - APEX_COORDS
-
-# ==========================================
-# 4. PROCESSING LOOP
-# ==========================================
 
 if SAVE_MODE == "multiple":
     # --- MULTIPLE FILES MODE ---

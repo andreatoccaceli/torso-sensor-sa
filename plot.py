@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-from scipy.signal import savgol_filter 
 from itertools import cycle
+
 
 # ==========================================
 # --- 1. CONFIGURATION ---
@@ -67,20 +67,97 @@ DISPLACEMENT_FILES = {
     #     "VOL_TIME_END" :  79.2,
     #     "VOL_0D_NAME" : "VLV"
     # },
-    "rho05-cbspline-no-bc-vertebral-column-no-interp": {
-        "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp.csv",
-        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_cubic_spline_reduced.csv",
+    # "Old-CSV": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_new.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_cubic_spline_reduced.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "New-CSV": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_new_csv.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "FinalFrame-OldIdx": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_new_csv_final_frame.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "FinalFrame-NewIdx": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_new_csv_fframe_nidx.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "LongHorizon": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/long_horizon.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "LongHorizon-Until": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/long_horizon_until.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "LongHorizon-Until-new": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/scg_signal_normal.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "Sensor-Radius-2cm": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/new_loc_probe_scg_sphere.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "Half-Single-Point-new": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/probe_scg.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    "Below-Apex": {
+        "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/below_apex.csv",
+        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
         "VOL_TIME_START" : 78.4, 
         "VOL_TIME_END" :  79.2,
         "VOL_0D_NAME" : "VLV"
     },
-    "rho05-cbspline-no-bc-vertebral-column-no-interp-periodicity": {
-        "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_periodicity.csv",
-        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_cubic_spline_reduced.csv",
+    "Scale-factor-07": {
+        "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/scale_factor_07.csv",
+        "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
         "VOL_TIME_START" : 78.4, 
         "VOL_TIME_END" :  79.2,
         "VOL_0D_NAME" : "VLV"
     },
+    # "Old-Wrong-with-pvsm": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/old_wrong_with_filter.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circ_limit_cycle_less_out.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
+    # "Using-T-per": {
+    #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_periodicity.csv",
+    #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_cubic_spline_reduced.csv",
+    #     "VOL_TIME_START" : 78.4, 
+    #     "VOL_TIME_END" :  79.2,
+    #     "VOL_0D_NAME" : "VLV"
+    # },
     #     "rho05-cbspline-no-bc-vertebral-column-no-interp-new": {
     #     "3d": "/home/andrea/Scrivania/phd/simulations/heart-torso/disp_torso/csv-data/rho05_cubic_spline_no_interp_new.csv",
     #     "0d": "/home/andrea/Scrivania/phd/dev/torso-sensor-sa/0D-volumes/circulation_cubic_spline_reduced.csv",
@@ -176,6 +253,7 @@ DISPLACEMENT_FILES = {
 
 # --- Standard Time Config ---
 DEFAULT_TIME_IDX = 1  
+HEARTBEAT_PERIOD = 0.8 
 
 # --- Global Volume Data Config (Fallback) ---
 VOL_TIME_START_GLOBAL = 39.2  
@@ -340,7 +418,7 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
 
     # --- 2.4 GET/COMPUTE ACCELERATION ---
     while True:
-        accel_choice = input(f"  -> Acceleration source? (c=COMPUTE, r=READ from csv)): ").strip().lower()
+        accel_choice = input(f"  -> Acceleration source? (c=COMPUTE, r=READ from csv): ").strip().lower()
         if accel_choice in ['c', 'r']: break
         print("     Invalid input. Enter 'c' or 'r'.")
 
@@ -353,15 +431,23 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
         col_a2 = "avg(acceleration (2))"
         col_an = "avg(normal_a)"
         
-        if col_a0 in df_disp.columns and col_a1 in df_disp.columns and col_a2 in df_disp.columns:
-            print(f"     Found standard columns: {col_a0}, {col_a1}, {col_a2}, {col_an}")
+        if col_a1 in df_disp.columns and col_a2 in df_disp.columns:
+            print(f"     Found standard columns: {col_a0}, {col_a1}, {col_a2}")
             a_x = df_disp[col_a0].values * RESCALED_FACTOR_A
             a_y = df_disp[col_a1].values * RESCALED_FACTOR_A
             a_z = df_disp[col_a2].values * RESCALED_FACTOR_A
 
-            accel_choice = input(f"  -> Read normal acceleration? (y or n)): ").strip().lower()
-            if accel_choice == 'y':
-                a_n = df_disp[col_an].values * RESCALED_FACTOR_A
+            read_normal = input(f"  -> Read normal acceleration? (y or n): ").strip().lower()
+            if read_normal == 'y':
+                if col_an in df_disp.columns:
+                    if 'Area' in df_disp.columns:
+                        print("     Trovata colonna 'Area': Calcolo accelerazione media...")
+                        a_n = (df_disp[col_an].values / df_disp['Area'].values) * RESCALED_FACTOR_A
+                    else:
+                        print("     Nessuna colonna 'Area' (Modalita' PUNTO).")
+                        a_n = df_disp[col_an].values * RESCALED_FACTOR_A
+                else:
+                    a_n = None
             else:
                 a_n = None
         else:
@@ -415,7 +501,7 @@ if not processed_dfs:
 
 
 # ==========================================
-# --- 3. LOAD VOLUME DATA (Per-File) ---
+# --- 3. LOAD VOLUME DATA (0D) ---
 # ==========================================
 print("\n--- Loading 0D Volume Data ---")
 
@@ -423,12 +509,9 @@ processed_0d = {}
 
 for label, file_path_dict in DISPLACEMENT_FILES.items():
     if not isinstance(file_path_dict, dict) or "0d" not in file_path_dict:
-        print(f"No 0D file specified for '{label}'. Skipping 0D load.")
         continue
         
     path_0d = file_path_dict["0d"]
-    
-    # Extract specific time windows, fallback to global if missing
     t_start = file_path_dict.get("VOL_TIME_START", VOL_TIME_START_GLOBAL)
     t_end = file_path_dict.get("VOL_TIME_END", VOL_TIME_END_GLOBAL)
     
@@ -436,9 +519,7 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
     
     try:
         df_raw_vol = pd.read_csv(path_0d)
-        df_filtered_vol = df_raw_vol[
-            (df_raw_vol['time'] >= t_start) & (df_raw_vol['time'] <= t_end)
-        ].copy()
+        df_filtered_vol = df_raw_vol[(df_raw_vol['time'] >= t_start) & (df_raw_vol['time'] <= t_end)].copy()
         
         if df_filtered_vol.empty:
             raise ValueError(f"Empty volume data in range {t_start} - {t_end}")
@@ -449,24 +530,14 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
         volume_values_m3 = volume_values * ML_TO_M3
         r_t_m = np.cbrt(CONST_3_OVER_2PI * volume_values_m3)
 
-        # Retrieve simulation time strictly for THIS specific 3D file to match its length
         if label in processed_dfs:
             sim_time = processed_dfs[label]['Actual_Time'].values
-            target_len = len(sim_time)
-            
-            n_repeats = int(np.ceil(target_len / len(volume_values)))
-            n_repeats = 3 
-            
-            volume_values = np.tile(volume_values, n_repeats)
-            r_t_m = np.tile(r_t_m, n_repeats)
-            
+            start_time_3d = sim_time[0] 
             original_dt = np.mean(np.diff(time_points_vol_original))
             total_points = len(volume_values)
-            start_time = time_points_vol_original[0]
-            # Adjust the time array so it always starts at 0 for plotting comparison
-            time_points_vol_original = (start_time + np.arange(total_points) * original_dt) - t_start
+            
+            time_points_vol_original = start_time_3d + np.arange(total_points) * original_dt
 
-        # 0D Acceleration
         a_r = np.zeros(len(r_t_m))
         if len(r_t_m) > 2:
             dt_array = np.diff(time_points_vol_original)
@@ -478,7 +549,6 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
             for i in range(2, len(r_t_m)):
                 a_r[i] = (r_t_m[i] - 2*r_t_m[i-1] + r_t_m[i-2]) / dt_squared
                 
-        # Store all arrays into a dictionary mapped to the label
         processed_0d[label] = {
             'time': time_points_vol_original,
             'vol': volume_values,
@@ -487,14 +557,68 @@ for label, file_path_dict in DISPLACEMENT_FILES.items():
         }
         
     except Exception as e:
-        print(f"Warning: Issue with volume data for {label} ({e}). 0D plots for this label will be skipped.")
+        print(f"Warning: Issue with volume data for {label} ({e}). Skipping.")
 
+# ==========================================
+# --- 3.5 MAGIC PERIODIC EXTENSION ---
+# ==========================================
+print("\n--- Applying Periodic Extension to Short Signals ---")
+
+global_max_time = 0.0
+for df in processed_dfs.values():
+    global_max_time = max(global_max_time, df['Actual_Time'].max())
+for d0 in processed_0d.values():
+    global_max_time = max(global_max_time, d0['time'].max())
+
+print(f"Global Maximum Time found across all files: {global_max_time:.2f}s")
+
+# Estendi i file 3D corti
+for label, df in processed_dfs.items():
+    local_max = df['Actual_Time'].max()
+    if local_max < global_max_time - (HEARTBEAT_PERIOD / 2):
+        copies = []
+        current_max = local_max
+        shift_multiplier = 1
+        
+        while current_max < global_max_time - 1e-3:
+            df_copy = df.copy()
+            df_copy['Actual_Time'] += shift_multiplier * HEARTBEAT_PERIOD
+            copies.append(df_copy)
+            current_max = df_copy['Actual_Time'].max()
+            shift_multiplier += 1
+            
+        if copies:
+            processed_dfs[label] = pd.concat([df] + copies, ignore_index=True)
+            print(f"  -> [3D] '{label}' extended: {local_max:.2f}s is too short. Appended {len(copies)} periodic copies (shift = {HEARTBEAT_PERIOD}s) to reach {processed_dfs[label]['Actual_Time'].max():.2f}s.")
+
+# Estendi i file 0D corti
+for label, d0 in processed_0d.items():
+    local_max = d0['time'].max()
+    if local_max < global_max_time - (HEARTBEAT_PERIOD / 2):
+        copies_t, copies_v, copies_r, copies_a = [], [], [], []
+        current_max = local_max
+        shift_multiplier = 1
+        
+        while current_max < global_max_time - 1e-3:
+            copies_t.append(d0['time'] + shift_multiplier * HEARTBEAT_PERIOD)
+            copies_v.append(d0['vol'])
+            copies_r.append(d0['radius'])
+            copies_a.append(d0['accel'])
+            current_max = copies_t[-1][-1]
+            shift_multiplier += 1
+            
+        if copies_t:
+            d0['time'] = np.concatenate([d0['time']] + copies_t)
+            d0['vol'] = np.concatenate([d0['vol']] + copies_v)
+            d0['radius'] = np.concatenate([d0['radius']] + copies_r)
+            d0['accel'] = np.concatenate([d0['accel']] + copies_a)
+            print(f"  -> [0D] '{label}' extended: {local_max:.2f}s is too short. Appended {len(copies_t)} periodic copies (shift = {HEARTBEAT_PERIOD}s) to reach {d0['time'].max():.2f}s.")
+
+print("--- Data Processing Complete ---")
 
 # ==========================================
 # --- 4. PLOTTING ---
 # ==========================================
-print("\n--- Plot Configuration ---")
-
 def get_plot_components(data_type_name):
     components = []
     while not components:
@@ -505,7 +629,6 @@ def get_plot_components(data_type_name):
                 if char == 'm' and 'magn' in choice_str: valid_comps.append('magn')
                 elif char in ['x','y','z', 'n']: valid_comps.append(char)
         if 'magn' in choice_str and 'magn' not in valid_comps: valid_comps.append('magn')
-        
         if valid_comps: return valid_comps
         print(f"--- No valid components found in '{choice_str}'. Try again. ---")
 
@@ -535,53 +658,52 @@ def plot_on_axis(ax, plot_info, all_dfs, all_0d_dfs):
     lines = cycle(['-', '--', ':', '-.'])
     lines_color = cycle(['tab:blue', 'tab:green', 'tab:red', 'black', 'tab:orange', 'tab:purple'])
 
+    max_time = 0 
+    min_time = float('inf')
+
+    for df in all_dfs.values():
+        max_time = max(max_time, df['Actual_Time'].max())
+        min_time = min(min_time, df['Actual_Time'].min())
+    for d0 in all_0d_dfs.values():
+        max_time = max(max_time, d0['time'].max())
+        min_time = min(min_time, d0['time'].min())
+
+    if min_time == float('inf'): min_time = 0
+
     if plot_type == '3d_accel':
         ax.set_ylabel('3D Acceleration (m/s^2)')
         for label, df_curr in all_dfs.items():
             cl = next(lines_color)
-            if 'x' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['acceleration_x'], color=cl, linestyle="-", label=f'{label} - Accel X')
-            if 'y' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['acceleration_y'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Y')
-            if 'z' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['acceleration_z'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Z')
-            if 'n' in components:
+            if 'x' in components: ax.plot(df_curr['Actual_Time'], df_curr['acceleration_x'], color=cl, linestyle="-", label=f'{label} - Accel X')
+            if 'y' in components: ax.plot(df_curr['Actual_Time'], df_curr['acceleration_y'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Y')
+            if 'z' in components: ax.plot(df_curr['Actual_Time'], df_curr['acceleration_z'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Z')
+            if 'n' in components and df_curr['acceleration_normal'] is not None: 
                 ax.plot(df_curr['Actual_Time'], df_curr['acceleration_normal'], color=cl, linestyle="-", label=f'{label} - Accel Norm')
-            if 'magn' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['acceleration_magnitude'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Mag')
+            if 'magn' in components: ax.plot(df_curr['Actual_Time'], df_curr['acceleration_magnitude'], color=next(lines_color), linestyle="-", label=f'{label} - Accel Mag')
         ax.set_title('3D Acceleration Comparison')
 
     elif plot_type == '3d_disp':
         ax.set_ylabel('3D Displacement (m)') 
         for label, df_curr in all_dfs.items():
             ls = next(lines)
-            if 'x' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['disp_x_m'], color='tab:blue', linestyle=ls, label=f'{label} - Disp X')
-            if 'y' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['disp_y_m'], color='tab:red', linestyle=ls, label=f'{label} - Disp Y')
-            if 'z' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['disp_z_m'], color='tab:green', linestyle=ls, label=f'{label} - Disp Z')
-            if 'n' in components:
+            if 'x' in components: ax.plot(df_curr['Actual_Time'], df_curr['disp_x_m'], color='tab:blue', linestyle=ls, label=f'{label} - Disp X')
+            if 'y' in components: ax.plot(df_curr['Actual_Time'], df_curr['disp_y_m'], color='tab:red', linestyle=ls, label=f'{label} - Disp Y')
+            if 'z' in components: ax.plot(df_curr['Actual_Time'], df_curr['disp_z_m'], color='tab:green', linestyle=ls, label=f'{label} - Disp Z')
+            if 'n' in components and df_curr['disp_n_m'] is not None: 
                 ax.plot(df_curr['Actual_Time'], df_curr['disp_n_m'], color='tab:orange', linestyle=ls, label=f'{label} - Disp Norm')
-            if 'magn' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['displacement_magnitude'], color='black', linestyle=ls, label=f'{label} - Disp Mag')
+            if 'magn' in components: ax.plot(df_curr['Actual_Time'], df_curr['displacement_magnitude'], color='black', linestyle=ls, label=f'{label} - Disp Mag')
         ax.set_title('3D Displacement Comparison')
     
     elif plot_type == '3d_vel':
         ax.set_ylabel('3D Velocity (m/s)') 
         for label, df_curr in all_dfs.items():
             cl = next(lines_color)
-            if 'x' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['velocity_x'], color=cl, linestyle="-", label=f'{label} - Vel X')
-            if 'y' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['velocity_y'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Y')
-            if 'z' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['velocity_z'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Z')
-            if 'magn' in components:
-                ax.plot(df_curr['Actual_Time'], df_curr['velocity_magnitude'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Mag')
+            if 'x' in components: ax.plot(df_curr['Actual_Time'], df_curr['velocity_x'], color=cl, linestyle="-", label=f'{label} - Vel X')
+            if 'y' in components: ax.plot(df_curr['Actual_Time'], df_curr['velocity_y'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Y')
+            if 'z' in components: ax.plot(df_curr['Actual_Time'], df_curr['velocity_z'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Z')
+            if 'magn' in components: ax.plot(df_curr['Actual_Time'], df_curr['velocity_magnitude'], color=next(lines_color), linestyle="-", label=f'{label} - Vel Mag')
         ax.set_title('3D Velocity Comparison')
 
-    # --- 0D PLOTS ---
     elif plot_type == '0d_vol':
         ax.set_ylabel('Volume (mL)')
         for label, data_0d in all_0d_dfs.items():
@@ -603,9 +725,16 @@ def plot_on_axis(ax, plot_info, all_dfs, all_0d_dfs):
             cl = next(lines_color)
             ax.plot(data_0d['time'], data_0d['radius'], color=cl, label=f'{label} - 0D Radius', linestyle=ls)
 
+    t_line = min_time + HEARTBEAT_PERIOD
+    first_line = True
+    while t_line <= max_time:
+        line_label = f'End of Beat ({HEARTBEAT_PERIOD}s)' if first_line else None
+        ax.axvline(x=t_line, color='red', linestyle='--', linewidth=1.2, alpha=0.6, label=line_label)
+        t_line += HEARTBEAT_PERIOD
+        first_line = False
+
     ax.set_xlabel('Time (s)')
     ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-    
     if ax.get_legend_handles_labels()[0]:
         ax.legend(loc='upper left', fontsize='small')
 
@@ -614,11 +743,10 @@ def plot_on_axis(ax, plot_info, all_dfs, all_0d_dfs):
 plot_type_top = get_plot_choice("Select data for TOP plot (ax1):")
 plot_type_bottom = get_plot_choice("Select data for BOTTOM plot (ax2):")
 
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 10))
+fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 10), sharex=True)
+
 plot_on_axis(ax1, plot_type_top, processed_dfs, processed_0d)
 plot_on_axis(ax2, plot_type_bottom, processed_dfs, processed_0d)
-
-# always plot 0D LV volume
 plot_on_axis(ax3, ('0d_vol', None), processed_dfs, processed_0d)
 
 fig.suptitle('Multi-File Comparison', fontsize=16, y=1.02)
